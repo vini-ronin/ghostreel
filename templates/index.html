@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GhostReel | Viral Explorer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: { 500: '#FF5A36', 600: '#E04A2A', 900: 'rgba(255,90,54,0.1)' }
+                    }
+                }
+            }
+        }
+
+
+    </script>
+    <style>
+        .dark body { background-color: #080808; color: #fff; }
+        .light body { background-color: #f8f9fa; color: #0f172a; }
+        
+        .dark .hero-bg { position: relative; background-color: #080808; border-bottom: 1px solid #1a1a1a; }
+        .light .hero-bg { position: relative; background-color: #ffffff; border-bottom: 1px solid #e2e8f0; }
+        
+        .dark .hero-bg::before {
+            content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+            background-image: radial-gradient(#222 1px, transparent 1px);
+            background-size: 24px 24px;
+            mask-image: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, transparent 100%);
+        }
+        .light .hero-bg::before {
+            content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 24px 24px;
+            mask-image: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, transparent 100%);
+        }
+        .hero-bg > * { position: relative; z-index: 1; }
+        
+        .dark .main-container { border-left: 1px solid #1a1a1a; border-right: 1px solid #1a1a1a; }
+        .light .main-container { border-left: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; background: #ffffff; }
+
+        .dark .card-bg { background-color: #050505; border-color: #1a1a1a; }
+        .light .card-bg { background-color: #ffffff; border-color: #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+
+        .dark .input-bg { background-color: #080808; border-color: #1a1a1a; color: #fff; }
+        .light .input-bg { background-color: #f8f9fa; border-color: #cbd5e1; color: #0f172a; }
+
+        .eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: #FF5A36; font-weight: 600; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; } 
+        .dark ::-webkit-scrollbar-track { background: #080808; } 
+        .dark ::-webkit-scrollbar-thumb { background: #1a1a1a; border-radius: 2px; }
+        .light ::-webkit-scrollbar-track { background: #f1f5f9; } 
+        .light ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
+        ::-webkit-scrollbar-thumb:hover { background: #FF5A36; }
+        
+        .checkbox-custom { appearance: none; width: 22px; height: 22px; border: 1px solid #333; background: rgba(0,0,0,0.8); cursor: pointer; position: relative; transition: all 0.15s; }
+        .light .checkbox-custom { border-color: #94a3b8; background: #ffffff; }
+        .checkbox-custom:checked::after { content: ''; position: absolute; top: 4px; left: 8px; width: 5px; height: 10px; border: solid #000; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+        .checkbox-custom:checked { background: #FF5A36; border-color: #FF5A36; }
+        
+        .video-card { transition: all 0.2s ease; animation: fadeIn 0.3s ease forwards; }
+        .dark .video-card { background: #050505; border: 1px solid #1a1a1a; }
+        .light .video-card { background: #ffffff; border: 1px solid #e2e8f0; }
+        .video-card:hover { border-color: #FF5A36; z-index: 10; transform: translateY(-3px); }
+        .thumbnail-gradient { background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.15) 100%); }
+        input, select { border-radius: 0 !important; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col font-sans transition-colors duration-200">
+    <div class="max-w-7xl mx-auto w-full main-container min-h-screen flex flex-col">
+
+        <!-- Top Header & Controls Bar -->
+        <div class="flex items-center justify-between px-6 md:px-12 pt-6 border-b dark:border-[#1a1a1a] border-slate-200 dark:bg-[#050505] bg-white pb-4 transition-colors">
+            <div class="flex items-center gap-3">
+                <img src="/static/logo.jpg" alt="GhostReel Logo" class="w-8 h-8 rounded border dark:border-[#1a1a1a] border-slate-200 shadow-[0_0_10px_rgba(255,90,54,0.3)]">
+                <span class="font-bold text-xl tracking-tight dark:text-white text-slate-900 leading-none">GHOST<span class="text-brand-500">REEL</span></span>
+            </div>
+            <div class="flex items-center gap-3">
+                
+
+                <!-- Language Selector -->
+                <button id="btnToggleLang" class="border dark:border-[#2a2a2a] border-slate-300 hover:border-brand-500 dark:text-gray-300 text-slate-700 hover:text-brand-500 px-3 py-1.5 dark:bg-[#080808] bg-slate-100 font-mono text-xs flex items-center gap-1.5 transition-colors">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <span id="langLabel">PT-BR</span>
+                </button>
+
+                <!-- Dark/Light Theme Toggle -->
+                <button id="btnToggleTheme" class="border dark:border-[#2a2a2a] border-slate-300 hover:border-brand-500 dark:text-gray-300 text-slate-700 hover:text-brand-500 p-2 dark:bg-[#080808] bg-slate-100 font-mono text-xs flex items-center justify-center transition-colors" title="Alternar Tema">
+                    <svg id="themeIconSun" class="w-3.5 h-3.5 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                    <svg id="themeIconMoon" class="w-3.5 h-3.5 block dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+                </button>
+
+                <!-- Session Modal Trigger -->
+                <button id="btnOpenSessionModal" class="border dark:border-[#2a2a2a] border-slate-300 hover:border-brand-500 dark:text-gray-300 text-slate-700 hover:text-brand-500 px-3 py-1.5 dark:bg-[#080808] bg-slate-100 font-mono text-xs flex items-center gap-2 transition-colors">
+                    <svg class="w-3.5 h-3.5 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" /></svg>
+                    <span id="sessionStatusText" data-i18n="btn_connect_ig">CONECTAR CONTA IG</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Hero Section -->
+        <div class="hero-bg pb-12 pt-12 px-6 md:px-12 transition-colors">
+            <section class="flex flex-col items-center text-center pb-12">
+                <p class="eyebrow mb-6" data-i18n="hero_eyebrow">OPEN SOURCE / LOCAL HOST</p>
+                <h1 class="text-5xl md:text-6xl font-extrabold tracking-tight mb-6 dark:text-white text-slate-900" data-i18n="hero_title">O Explorador que <span class="text-brand-500 italic">realmente</span> encontra virais.</h1>
+                <p class="dark:text-gray-400 text-slate-600 max-w-2xl text-lg leading-relaxed" data-i18n="hero_desc">Busque perfis, filtre por Reels ou Carrosséis, analise métricas em tempo real e faça download direto em alta qualidade.</p>
+
+                
+
+            </section>
+            <section class="card-bg border p-6 md:p-8 max-w-5xl mx-auto mt-4 transition-colors">
+                <p class="eyebrow mb-4" data-i18n="quick_start">QUICK START</p>
+                <div class="flex flex-col md:flex-row gap-4 items-stretch">
+                    <div class="flex-1 relative">
+                        <span class="absolute left-5 top-1/2 -translate-y-1/2 text-brand-500 font-mono text-lg">@</span>
+                        <input type="text" id="usernameInput" placeholder="username" class="w-full h-full min-h-[56px] input-bg pl-12 pr-6 border focus:outline-none focus:border-brand-500 transition-all font-mono text-base placeholder-gray-500">
+                    </div>
+                    <div class="flex flex-wrap md:flex-nowrap gap-3">
+                        <select id="typeSelect" class="input-bg px-4 min-h-[56px] border focus:outline-none focus:border-brand-500 font-mono text-xs cursor-pointer">
+                            <option value="reels" selected data-i18n="opt_reels_only">APENAS REELS</option>
+                            <option value="carousels" data-i18n="opt_carousels_only">APENAS CARROSSÉIS</option>
+                            <option value="all" data-i18n="opt_all_formats">TODOS FORMATOS</option>
+                        </select>
+                        <select id="limitSelect" class="input-bg px-4 min-h-[56px] border focus:outline-none focus:border-brand-500 font-mono text-xs cursor-pointer">
+                            <option value="9999" data-i18n="opt_all">TODOS OS ITENS</option>
+                                    <option value="12" selected data-i18n="opt_12_fast">12 ITENS (RÁPIDO)</option>
+                            <option value="30" data-i18n="opt_30">30 ITENS</option>
+                            <option value="50" data-i18n="opt_50">50 ITENS</option>
+                            <option value="100" data-i18n="opt_100">100 ITENS</option>
+                            <option value="200" data-i18n="opt_200">200 ITENS</option>
+                        </select>
+                        <select id="sortSelect" class="input-bg px-4 min-h-[56px] border focus:outline-none focus:border-brand-500 font-mono text-xs cursor-pointer">
+                            <option value="views" data-i18n="opt_sort_views">MAIS VIEWS</option>
+                            <option value="likes" data-i18n="opt_sort_likes">MAIS LIKES</option>
+                        </select>
+                        <button id="btnSearch" class="bg-brand-500 hover:bg-brand-600 text-black font-bold px-8 min-h-[56px] transition-all font-mono text-sm flex items-center justify-center gap-2">
+                            <span data-i18n="btn_search">BUSCAR</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Main Content Area -->
+        <main class="flex-grow w-full px-6 md:px-12 py-12">
+            <!-- Loading Indicator Bar -->
+            <div id="streamingIndicator" class="hidden items-center justify-between p-4 mb-8 dark:bg-[#0a0a0a] bg-slate-100 border dark:border-[#1a1a1a] border-slate-200">
+                <div class="flex items-center gap-3">
+                    <div class="w-3 h-3 bg-brand-500 rounded-full animate-ping"></div>
+                    <span id="streamingStatus" class="font-mono text-xs dark:text-gray-300 text-slate-700" data-i18n="status_mining">MINERANDO EM TEMPO REAL...</span>
+                </div>
+                <button id="btnStop" class="border border-red-500/50 hover:border-red-500 text-red-500 hover:text-red-400 font-mono text-xs py-1.5 px-4 dark:bg-red-950/20 bg-red-100/50 hover:bg-red-950/40 transition-colors flex items-center gap-2">
+                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/></svg>
+                    <span data-i18n="btn_stop">PARAR BUSCA</span>
+                </button>
+            </div>
+
+            <!-- Terminal Error Card with Copy Button -->
+            <div id="errorState" class="hidden flex-col gap-3 mb-8 border border-red-500/30 dark:bg-[#0d0707] bg-red-50 p-5 max-w-full overflow-hidden">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-red-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                        <span class="font-mono text-xs font-bold text-red-500 tracking-wider uppercase" data-i18n="error_title">AVISO DO SISTEMA</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button id="btnCopyError" class="border border-red-500/40 hover:border-red-400 text-red-500 hover:text-red-400 px-3 py-1 dark:bg-red-950/40 bg-white font-mono text-[11px] flex items-center gap-1.5 transition-colors">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>
+                            <span data-i18n="btn_copy_error">COPIAR ERRO</span>
+                        </button>
+                        <button onclick="document.getElementById('errorState').classList.add('hidden')" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-xs font-mono px-2 py-1" data-i18n="btn_close">FECHAR</button>
+                    </div>
+                </div>
+                <p id="errorMsg" class="font-mono text-xs dark:text-gray-300 text-slate-700 leading-relaxed break-words"></p>
+                <div id="rawLogContainer" class="hidden mt-2 pt-2 border-t border-red-500/10">
+                    <p class="font-mono text-[10px] text-gray-500 mb-1 uppercase" data-i18n="tech_log">Log Técnico:</p>
+                    <div id="rawErrorMsg" class="font-mono text-[11px] text-red-500/90 dark:bg-black/60 bg-white p-3 max-h-24 overflow-y-auto break-all whitespace-pre-wrap border dark:border-white/5 border-red-200"></div>
+                </div>
+            </div>
+
+            <div id="resultsArea" class="hidden flex-col gap-10">
+                <!-- Profile Card -->
+                <section class="card-bg border flex flex-col md:flex-row items-center justify-between gap-8 p-8 transition-colors">
+                    <div class="flex items-center gap-8">
+                        <img id="profPic" src="" class="w-24 h-24 rounded-full border dark:border-[#1a1a1a] border-slate-300 object-cover">
+                        <div>
+                            <h2 id="profName" class="text-2xl font-bold dark:text-white text-slate-900 tracking-tight mb-2"></h2>
+                            <a id="profHandle" href="#" target="_blank" class="text-sm font-mono text-brand-500 hover:underline flex items-center gap-1.5">
+                                <span>@username</span>
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                            </a>
+                            <p id="profBio" class="text-sm dark:text-gray-400 text-slate-600 mt-3 max-w-lg"></p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-12 md:border-l dark:border-[#1a1a1a] border-slate-200 md:pl-12">
+                        <div><div class="eyebrow text-gray-500 mb-2" data-i18n="metric_views">VIEWS</div><div id="profViews" class="text-3xl font-mono dark:text-white text-slate-900 font-bold">0</div></div>
+                        <div><div class="eyebrow text-gray-500 mb-2" data-i18n="metric_likes">LIKES</div><div id="profLikes" class="text-3xl font-mono dark:text-white text-slate-900 font-bold">0</div></div>
+                        <div><div class="eyebrow text-gray-500 mb-2" data-i18n="metric_items">ITENS</div><div id="profPosts" class="text-3xl font-mono text-brand-500 font-bold">0</div></div>
+                    </div>
+                </section>
+
+                <!-- Related Profiles / Radar de Nicho -->
+                <section id="relatedSection" class="card-bg border hidden flex-col gap-3 p-6 transition-colors">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                            <p class="eyebrow dark:text-gray-300 text-slate-700" data-i18n="related_title">PERFIS SEMELHANTES / MESMO NICHO</p>
+                        </div>
+                        <span class="text-xs font-mono text-gray-500" data-i18n="related_hint">Clique para copiar o @</span>
+                    </div>
+                    <div id="relatedList" class="flex gap-3 overflow-x-auto pb-2 pt-1"></div>
+                </section>
+
+                <!-- Sorting & Selection Toolbar -->
+                <section class="flex flex-col md:flex-row justify-between items-center border-b dark:border-[#1a1a1a] border-slate-200 pb-5 gap-6">
+                    <div class="flex gap-8 font-mono text-sm">
+                        <button onclick="sortBy('views')" class="sort-tab text-brand-500 border-b-2 border-brand-500 pb-2" data-sort="views" data-i18n="tab_views">VIEWS</button>
+                        <button onclick="sortBy('likes')" class="sort-tab text-gray-500 hover:dark:text-white hover:text-slate-900 transition-colors pb-2" data-sort="likes" data-i18n="tab_likes">LIKES</button>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <button id="btnSelectAll" class="border dark:border-[#2a2a2a] border-slate-300 hover:border-brand-500 dark:text-gray-300 text-slate-700 font-mono text-xs py-2.5 px-4 transition-colors">
+                            <span data-i18n="btn_select_all">SELECIONAR TODOS</span>
+                        </button>
+                        <div class="text-sm font-mono text-gray-500"><span id="selectedCount" class="dark:text-white text-slate-900 text-base font-bold">0</span> <span data-i18n="lbl_selected">SEL.</span></div>
+                        <button id="btnDownload" class="border border-brand-500 text-brand-500 hover:bg-brand-500 hover:text-black font-mono text-sm py-2.5 px-6 transition-colors flex items-center gap-3 font-bold">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                            <span data-i18n="btn_download_sel">BAIXAR SELECIONADOS (.ZIP)</span>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Video Grid -->
+                <section id="videoGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></section>
+                <div id="emptyState" class="hidden text-center py-20 text-gray-500 font-mono text-sm" data-i18n="empty_state">Nenhum item encontrado com o filtro selecionado.</div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Session Connect Modal -->
+    <div id="sessionModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="card-bg border max-w-lg w-full p-6 md:p-8 flex flex-col gap-6 shadow-2xl transition-colors">
+            <div class="flex items-center justify-between border-b dark:border-[#1a1a1a] border-slate-200 pb-4">
+                <div class="flex items-center gap-2">
+                    <svg class="w-5 h-5 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" /></svg>
+                    <h3 class="font-mono text-sm font-bold tracking-wider dark:text-white text-slate-900 uppercase" data-i18n="modal_title">Conectar Sessão Instagram</h3>
+                </div>
+                <button id="btnCloseSessionModal" class="text-gray-500 hover:text-white font-mono text-lg">&times;</button>
+            </div>
+            
+            <div class="text-xs font-mono dark:text-gray-400 text-slate-600 leading-relaxed flex flex-col gap-3">
+                <p data-i18n="modal_desc">Para minerar 100% livre de bloqueios 401, cole o valor do cookie <code class="text-brand-500 dark:bg-black bg-slate-200 px-1.5 py-0.5 border dark:border-[#333] border-slate-300">sessionid</code> do seu navegador:</p>
+                <ol class="list-decimal pl-4 space-y-1 text-gray-500 text-[11px]">
+                    <li data-i18n="modal_step1">Abra o Instagram no Chrome (logado)</li>
+                    <li data-i18n="modal_step2">Aperte F12 &rarr; Aba Application / Aplicativo</li>
+                    <li data-i18n="modal_step3">No menu esquerdo: Cookies &rarr; https://www.instagram.com</li>
+                    <li data-i18n="modal_step4">Copie o valor do cookie <b>sessionid</b> e cole abaixo:</li>
+                </ol>
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <label class="eyebrow text-gray-400 text-[10px]">COOKIE SESSIONID</label>
+                <input type="password" id="sessionInput" placeholder="Ex: 73579792425%3A..." class="w-full input-bg px-4 py-3 border focus:border-brand-500 font-mono text-xs outline-none">
+            </div>
+
+            <div class="flex justify-end gap-3 pt-2">
+                <button id="btnCancelSession" class="px-4 py-2 border dark:border-[#2a2a2a] border-slate-300 hover:border-gray-500 font-mono text-xs text-gray-400" data-i18n="btn_cancel">CANCELAR</button>
+                <button id="btnSaveSession" class="px-6 py-2 bg-brand-500 hover:bg-brand-600 text-black font-bold font-mono text-xs transition-colors flex items-center gap-2">
+                    <span data-i18n="btn_save_session">SALVAR SESSÃO</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-8 right-8 dark:bg-[#080808] bg-slate-900 border border-brand-500 text-white px-8 py-5 shadow-2xl transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-4 font-mono text-sm">
+        <div class="w-3 h-3 bg-brand-500"></div>
+        <span id="toastMsg"></span>
+    </div>
+
+    <script>
+        // i18n Dictionary
+        const i18n = {
+            'pt-BR': {
+                'btn_how_it_works': 'COMO FUNCIONA',
+                'opt_all': 'TODOS OS ITENS',
+                'how_title': 'Como usar o GhostReel',
+                'how_s1': '1. <b>Conecte sua conta IG</b> no topo (usamos seu login para ler os vídeos em alta velocidade).',
+                'how_s2': '2. Digite um <b>@usuário</b> que você quer minerar.',
+                'how_s3': '3. O GhostReel baixa todos os <b>Reels</b> ou Carrosséis disponíveis com métricas reais (Views, Likes).',
+                'how_s4': '4. Clique em baixar no vídeo desejado ou selecione vários e <b>baixe tudo em um .ZIP</b>.',
+                'how_close': 'FECHAR',
+
+                'subtitle_explorer': 'The Explorer that really finds virals.',
+                'btn_open_folder': 'PASTA DOWNLOADS',
+                'btn_connect_ig': 'CONECTAR CONTA IG',
+                'hero_eyebrow': 'OPEN SOURCE / LOCAL HOST',
+                'hero_title': 'O Explorador que <span class="text-brand-500 italic">realmente</span> encontra virais.',
+                'hero_desc': 'Busque perfis, filtre por Reels ou Carrosséis, analise métricas em tempo real e faça download direto em alta qualidade.',
+                'quick_start': 'QUICK START',
+                'opt_reels_only': 'APENAS REELS',
+                'opt_carousels_only': 'APENAS CARROSSÉIS',
+                'opt_all_formats': 'TODOS FORMATOS',
+                'opt_12_fast': '12 ITENS (RÁPIDO)',
+                'opt_30': '30 ITENS',
+                'opt_50': '50 ITENS',
+                'opt_100': '100 ITENS',
+                'opt_200': '200 ITENS',
+                'opt_sort_views': 'MAIS VIEWS',
+                'opt_sort_likes': 'MAIS LIKES',
+                'btn_search': 'BUSCAR',
+                'status_mining': 'MINERANDO EM TEMPO REAL...',
+                'btn_stop': 'PARAR BUSCA',
+                'error_title': 'AVISO DO SISTEMA',
+                'btn_copy_error': 'COPIAR ERRO',
+                'btn_close': 'FECHAR',
+                'tech_log': 'Log Técnico:',
+                'metric_views': 'VIEWS',
+                'metric_likes': 'LIKES',
+                'metric_items': 'ITENS',
+                'related_title': 'PERFIS SEMELHANTES / MESMO NICHO',
+                'related_hint': 'Clique para copiar o @',
+                'tab_views': 'VIEWS',
+                'tab_likes': 'LIKES',
+                'btn_select_all': 'SELECIONAR TODOS',
+                'btn_deselect_all': 'DESMARCAR TODOS',
+                'lbl_selected': 'SEL.',
+                'btn_download_sel': 'BAIXAR SELECIONADOS (.ZIP)',
+                'empty_state': 'Nenhum item encontrado com o filtro selecionado.',
+                'modal_title': 'Conectar Sessão Instagram',
+                'modal_desc': 'Para minerar 100% livre de bloqueios 401, cole o valor do cookie sessionid do seu navegador:',
+                'modal_step1': 'Abra o Instagram no Chrome (logado)',
+                'modal_step2': 'Aperte F12 &rarr; Aba Application / Aplicativo',
+                'modal_step3': 'No menu esquerdo: Cookies &rarr; https://www.instagram.com',
+                'modal_step4': 'Copie o valor do cookie sessionid e cole abaixo:',
+                'btn_cancel': 'CANCELAR',
+                'btn_save_session': 'SALVAR SESSÃO',
+                'toast_copied': '@{text} copiado!',
+                'toast_error_copied': 'Log de erro copiado!',
+                'toast_stopped': 'Busca interrompida. {count} itens mantidos.',
+                'toast_finished': 'Mineração concluída! {count} itens encontrados.',
+                'toast_dl_started': 'Baixando vídeo {code}.mp4...',
+                'toast_dl_zip_started': 'Gerando arquivo .ZIP com {count} vídeos...',
+                'toast_folder_opened': 'Pasta downloads/ aberta no Windows Explorer!'
+            },
+            'en': {
+                'btn_how_it_works': 'HOW IT WORKS',
+                'opt_all': 'ALL ITEMS',
+                'how_title': 'How to use GhostReel',
+                'how_s1': '1. <b>Connect your IG account</b> at the top (we use your login to read videos at high speed).',
+                'how_s2': '2. Type a <b>@username</b> you want to mine.',
+                'how_s3': '3. GhostReel fetches all <b>Reels</b> or Carousels available with real metrics (Views, Likes).',
+                'how_s4': '4. Click download on the desired video or select multiple and <b>download everything in a .ZIP</b>.',
+                'how_close': 'CLOSE',
+
+                'subtitle_explorer': 'The Explorer that really finds virals.',
+                'btn_open_folder': 'DOWNLOADS FOLDER',
+                'btn_connect_ig': 'CONNECT IG ACCOUNT',
+                'hero_eyebrow': 'OPEN SOURCE / LOCAL HOST',
+                'hero_title': 'O Explorador que <span class="text-brand-500 italic">realmente</span> encontra virais.',
+                'hero_desc': 'Search profiles, filter by Reels or Carousels, analyze engagement metrics in real-time and download direct MP4s in high quality.',
+                'quick_start': 'QUICK START',
+                'opt_reels_only': 'REELS ONLY',
+                'opt_carousels_only': 'CAROUSELS ONLY',
+                'opt_all_formats': 'ALL FORMATS',
+                'opt_12_fast': '12 ITEMS (FAST)',
+                'opt_30': '30 ITEMS',
+                'opt_50': '50 ITEMS',
+                'opt_100': '100 ITEMS',
+                'opt_200': '200 ITEMS',
+                'opt_sort_views': 'MOST VIEWS',
+                'opt_sort_likes': 'MOST LIKES',
+                'btn_search': 'SEARCH',
+                'status_mining': 'MINING IN REAL TIME...',
+                'btn_stop': 'STOP SEARCH',
+                'error_title': 'SYSTEM NOTICE',
+                'btn_copy_error': 'COPY ERROR',
+                'btn_close': 'CLOSE',
+                'tech_log': 'Technical Log:',
+                'metric_views': 'VIEWS',
+                'metric_likes': 'LIKES',
+                'metric_items': 'ITEMS',
+                'related_title': 'SIMILAR PROFILES / SAME NICHE',
+                'related_hint': 'Click to copy @handle',
+                'tab_views': 'VIEWS',
+                'tab_likes': 'LIKES',
+                'btn_select_all': 'SELECT ALL',
+                'btn_deselect_all': 'DESELECT ALL',
+                'lbl_selected': 'SEL.',
+                'btn_download_sel': 'DOWNLOAD SELECTED (.ZIP)',
+                'empty_state': 'No items found matching the selected filter.',
+                'modal_title': 'Connect Instagram Session',
+                'modal_desc': 'To scrape 100% free of 401 rate limits, paste your browser sessionid cookie below:',
+                'modal_step1': 'Open Instagram in Chrome (logged in)',
+                'modal_step2': 'Press F12 &rarr; Application Tab',
+                'modal_step3': 'Left Sidebar: Cookies &rarr; https://www.instagram.com',
+                'modal_step4': 'Copy sessionid cookie value and paste below:',
+                'btn_cancel': 'CANCEL',
+                'btn_save_session': 'SAVE SESSION',
+                'toast_copied': '@{text} copied to clipboard!',
+                'toast_error_copied': 'Error log copied!',
+                'toast_stopped': 'Search stopped. {count} items kept.',
+                'toast_finished': 'Scraping finished! {count} items found.',
+                'toast_dl_started': 'Downloading video {code}.mp4...',
+                'toast_dl_zip_started': 'Generating .ZIP with {count} videos...',
+                'toast_folder_opened': 'Downloads folder opened in Windows Explorer!'
+            }
+        };
+
+        let currentLang = localStorage.getItem('ghostreel_lang') || 'pt-BR';
+        let currentTheme = localStorage.getItem('ghostreel_theme') || 'dark';
+        let currentReels = [];
+        let reelsMap = new Map();
+        let allSelected = false;
+        let activeAbortController = null;
+        let lastErrorText = '';
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('ghostreel_lang', lang);
+            document.getElementById('langLabel').innerText = lang === 'pt-BR' ? 'EN-US' : 'PT-BR';
+            
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.dataset.i18n;
+                if (i18n[lang] && i18n[lang][key]) {
+                    el.innerHTML = i18n[lang][key];
+                }
+            });
+        }
+
+        document.getElementById('btnToggleLang').addEventListener('click', () => {
+            const nextLang = currentLang === 'pt-BR' ? 'en' : 'pt-BR';
+            setLanguage(nextLang);
+        });
+
+        function setTheme(theme) {
+            currentTheme = theme;
+            localStorage.setItem('ghostreel_theme', theme);
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+                document.documentElement.classList.remove('light');
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.documentElement.classList.add('light');
+            }
+        }
+
+        document.getElementById('btnToggleTheme').addEventListener('click', () => {
+            setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+        });
+
+        
+        // Initialize Theme & Lang
+        setTheme(currentTheme);
+        setLanguage(currentLang);
+
+        fetch('/api/session/status').then(r => r.json()).then(data => {
+            if (data.logged_in) {
+                document.getElementById('sessionStatusText').innerText = `@${data.username.toUpperCase()} (LOGADO)`;
+            }
+        });
+
+        function fmt(n) { if (n >= 1e6) return (n/1e6).toFixed(1)+'M'; if (n >= 1e3) return (n/1e3).toFixed(1)+'K'; return n.toString(); }
+        function fmtDur(s) { const m = Math.floor(s/60); return m + ':' + String(Math.floor(s%60)).padStart(2,'0'); }
+        function toast(msg) { const t = document.getElementById('toast'); document.getElementById('toastMsg').innerText = msg; t.classList.remove('translate-y-20','opacity-0'); setTimeout(() => t.classList.add('translate-y-20','opacity-0'), 3500); }
+
+        const sessionModal = document.getElementById('sessionModal');
+        document.getElementById('btnOpenSessionModal').addEventListener('click', () => {
+            sessionModal.classList.remove('hidden');
+            sessionModal.classList.add('flex');
+            document.getElementById('sessionInput').focus();
+        });
+        document.getElementById('btnCloseSessionModal').addEventListener('click', () => {
+            sessionModal.classList.add('hidden');
+            sessionModal.classList.remove('flex');
+        });
+        document.getElementById('btnCancelSession').addEventListener('click', () => {
+            sessionModal.classList.add('hidden');
+            sessionModal.classList.remove('flex');
+        });
+
+        document.getElementById('btnSaveSession').addEventListener('click', async () => {
+            const sid = document.getElementById('sessionInput').value.trim();
+            if (!sid) { toast('Cole o cookie sessionid.'); return; }
+
+            const btn = document.getElementById('btnSaveSession');
+            btn.disabled = true;
+            btn.innerHTML = 'CONECTANDO...';
+
+            try {
+                const res = await fetch('/api/session', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ sessionid: sid })
+                });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    toast(data.message);
+                    document.getElementById('sessionStatusText').innerText = `@${data.username.toUpperCase()} (LOGADO)`;
+                    sessionModal.classList.add('hidden');
+                    sessionModal.classList.remove('flex');
+                    document.getElementById('sessionInput').value = '';
+                } else {
+                    toast(data.message || 'Erro ao validar cookie.');
+                }
+            } catch(e) {
+                toast('Erro de conexão com o servidor.');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = i18n[currentLang]['btn_save_session'];
+            }
+        });
+
+        function updateSel() { 
+            const count = document.querySelectorAll('.reel-cb:checked').length;
+            document.getElementById('selectedCount').innerText = count;
+            const btn = document.getElementById('btnSelectAll');
+            const span = btn.querySelector('span') || btn;
+            if (count === currentReels.length && currentReels.length > 0) {
+                span.innerText = i18n[currentLang]['btn_deselect_all'];
+                allSelected = true;
+            } else {
+                span.innerText = i18n[currentLang]['btn_select_all'];
+                allSelected = false;
+            }
+        }
+
+        function toggleSelectAll() {
+            allSelected = !allSelected;
+            document.querySelectorAll('.reel-cb').forEach(cb => cb.checked = allSelected);
+            updateSel();
+        }
+        document.getElementById('btnSelectAll').addEventListener('click', toggleSelectAll);
+
+        function updateMetrics() {
+            const totalViews = currentReels.reduce((a, c) => a + c.views, 0);
+            const totalLikes = currentReels.reduce((a, c) => a + c.likes, 0);
+            document.getElementById('profViews').innerText = fmt(totalViews);
+            document.getElementById('profLikes').innerText = fmt(totalLikes);
+            document.getElementById('profPosts').innerText = currentReels.length;
+
+            if (currentReels.length > 0) {
+                const avgViews = totalViews / currentReels.length;
+                currentReels.forEach(r => {
+                    r.is_viral = (r.views >= avgViews * 1.8) && (r.views > 3000);
+                });
+            }
+        }
+
+        function sortBy(field) {
+            document.querySelectorAll('.sort-tab').forEach(b => { b.classList.remove('text-brand-500','border-b-2','border-brand-500'); b.classList.add('text-gray-500'); });
+            const active = document.querySelector('.sort-tab[data-sort="' + field + '"]');
+            if (active) {
+                active.classList.add('text-brand-500','border-b-2','border-brand-500');
+                active.classList.remove('text-gray-500');
+            }
+            if (field === 'views') currentReels.sort((a,b) => b.views - a.views);
+            if (field === 'likes') currentReels.sort((a,b) => b.likes - a.likes);
+            renderGrid(currentReels);
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                toast(i18n[currentLang]['toast_copied'].replace('{text}', text));
+                document.getElementById('usernameInput').value = text;
+            });
+        }
+
+        document.getElementById('btnCopyError').addEventListener('click', () => {
+            if (lastErrorText) {
+                navigator.clipboard.writeText(lastErrorText).then(() => {
+                    toast(i18n[currentLang]['toast_error_copied']);
+                });
+            }
+        });
+
+        // Trigger Direct Browser Download via Hidden Iframe / Link
+        function triggerDownload(shortcode) {
+            const reel = reelsMap.get(shortcode);
+            if (!reel) return;
+
+            toast(i18n[currentLang]['toast_dl_started'].replace('{code}', shortcode));
+            
+            // Dispara download direto no navegador (Chrome mostra a barra de download)
+            const downloadUrl = `/api/download_video/${shortcode}?vurl=${encodeURIComponent(reel.video_url || '')}`;
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.download = `${shortcode}.mp4`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function renderRelated(profiles) {
+            const sec = document.getElementById('relatedSection');
+            const list = document.getElementById('relatedList');
+            list.innerHTML = '';
+            if (!profiles || profiles.length === 0) {
+                sec.classList.add('hidden');
+                return;
+            }
+            sec.classList.remove('hidden');
+            sec.classList.add('flex');
+            profiles.forEach(p => {
+                const btn = document.createElement('div');
+                btn.className = 'flex items-center gap-2 px-3 py-1.5 border dark:border-[#1a1a1a] border-slate-300 hover:border-brand-500 dark:bg-[#080808] bg-slate-100 transition-all font-mono text-xs whitespace-nowrap dark:text-gray-300 text-slate-700 hover:text-brand-500 shrink-0 group';
+                
+                const picHtml = p.profile_pic_url 
+                    ? '<img src="/api/proxy_image?url=' + encodeURIComponent(p.profile_pic_url) + '" class="w-6 h-6 rounded-full object-cover border border-white/10">' 
+                    : '<div class="w-6 h-6 rounded-full bg-brand-500/20 text-brand-500 flex items-center justify-center text-[10px]">@</div>';
+                
+                btn.innerHTML = picHtml
+                    + '<span class="cursor-pointer font-medium hover:underline" title="Copiar e minerar">@' + p.username + '</span>'
+                    + '<button class="cursor-pointer text-gray-500 group-hover:text-brand-500 p-0.5" title="Copiar @ e buscar"><svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg></button>'
+                    + '<a href="https://www.instagram.com/' + p.username + '/" target="_blank" rel="noopener noreferrer" class="border-l dark:border-[#222] border-slate-300 pl-1.5 ml-1 text-gray-400 hover:text-brand-500 transition-colors p-0.5 flex items-center gap-1" title="Abrir perfil no Instagram">'
+                    + '<svg class="w-3.5 h-3.5 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>'
+                    + '</a>';
+
+                // Clicking the username or copy icon triggers copy + auto-fill
+                const userSpan = btn.querySelector('span');
+                const copyBtn = btn.querySelector('button');
+                const selectProfile = () => {
+                    copyToClipboard(p.username);
+                    document.getElementById('usernameInput').value = p.username;
+                };
+                userSpan.onclick = selectProfile;
+                copyBtn.onclick = selectProfile;
+
+                list.appendChild(btn);
+            });
+        }
+
+        function createCard(reel) {
+            const card = document.createElement('div');
+            card.className = 'video-card relative overflow-hidden aspect-[9/16] cursor-pointer group';
+            card.dataset.shortcode = reel.shortcode;
+            
+            const viralBadge = reel.is_viral ? '<span class="bg-brand-500 text-black text-[10px] font-mono font-bold px-2 py-0.5 shadow-lg tracking-wider flex items-center gap-1"><svg class="w-3 h-3 text-black" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.527.82-1.127 2.18-1.574 3.28-.445 1.096-.902 2.37-1.453 3.47A15.897 15.897 0 015.65 6.4a1 1 0 00-1.57.8c-.027.848.068 1.906.37 2.92.35 1.173.973 2.327 1.844 3.21a7.97 7.97 0 005.674 2.37 7.97 7.97 0 005.674-2.37c.87-.883 1.493-2.037 1.844-3.21.302-1.014.397-2.072.37-2.92a1 1 0 00-1.57-.8 15.897 15.897 0 01-1.45 3.424c-.55-1.1-1.008-2.374-1.453-3.47-.447-1.1-.647-2.46-1.174-3.28a3.146 3.146 0 00-.822-.88z" clip-rule="evenodd" /></svg>VIRAL</span>' : '';
+
+            const tagInfo = reel.is_sidecar 
+                ? '<span class="text-white text-[10px] font-mono border border-blue-500/50 bg-blue-950/80 px-2 py-0.5 text-blue-300">CARROSSEL</span>'
+                : (reel.is_video ? '<span class="text-white text-[10px] font-mono border border-[#333] bg-black/80 px-2 py-0.5">' + fmtDur(reel.duration) + '</span>' : '<span class="text-white text-[10px] font-mono border border-[#333] bg-black/80 px-2 py-0.5">FOTO</span>');
+
+            card.innerHTML = '<img src="/api/proxy_image?url=' + encodeURIComponent(reel.thumbnail_url) + '" class="absolute inset-0 w-full h-full object-cover opacity-75 group-hover:opacity-100 transition-opacity" loading="lazy">'
+                + '<div class="absolute inset-0 thumbnail-gradient flex flex-col justify-between p-4">'
+                + '<div class="flex justify-between items-start">'
+                + '<input type="checkbox" class="checkbox-custom reel-cb" data-shortcode="' + reel.shortcode + '">'
+                + '<div class="flex flex-col items-end gap-1.5">'
+                + viralBadge
+                + tagInfo
+                + '</div>'
+                + '</div>'
+                + '<div>'
+                + '<div class="flex justify-between items-end mb-2">'
+                + '<div class="font-mono text-xs">'
+                + (reel.is_video ? '<div class="text-brand-500 text-sm font-bold"><span class="text-gray-400 font-normal">V:</span> ' + fmt(reel.views) + '</div>' : '')
+                + '<div class="text-gray-300"><span class="text-gray-400">L:</span> ' + fmt(reel.likes) + '</div>'
+                + '</div>'
+                + '<div class="flex items-center gap-1.5">'
+                + '<button class="btn-single-dl text-gray-300 hover:text-brand-500 p-1.5 bg-black/80 border border-white/10 hover:border-brand-500 transition-colors" title="Baixar Vídeo">'
+                + '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>'
+                + '</button>'
+                + '<a href="' + reel.url + '" target="_blank" onclick="event.stopPropagation()" class="text-gray-300 hover:text-brand-500 p-1.5 bg-black/80 border border-white/10 hover:border-brand-500 transition-colors" title="Ver no Instagram">'
+                + '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>'
+                + '</a>'
+                + '</div>'
+                + '</div>'
+                + '<p class="text-xs line-clamp-2 text-gray-300 leading-relaxed font-sans">' + reel.caption + '</p>'
+                + '</div></div>';
+
+            card.addEventListener('click', e => { 
+                if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'A' && !e.target.closest('a') && !e.target.closest('button')) { 
+                    const cb = card.querySelector('input'); 
+                    cb.checked = !cb.checked; 
+                    updateSel(); 
+                } 
+            });
+            card.querySelector('input').addEventListener('change', updateSel);
+            
+            card.querySelector('.btn-single-dl').addEventListener('click', (e) => {
+                e.stopPropagation();
+                triggerDownload(reel.shortcode);
+            });
+
+            return card;
+        }
+
+        function appendReels(batch) {
+            const grid = document.getElementById('videoGrid');
+            const empty = document.getElementById('emptyState');
+            empty.classList.add('hidden');
+            grid.classList.remove('hidden');
+
+            batch.forEach(reel => {
+                currentReels.push(reel);
+                reelsMap.set(reel.shortcode, reel);
+                const card = createCard(reel);
+                grid.appendChild(card);
+            });
+            updateMetrics();
+            updateSel();
+        }
+
+        function renderGrid(reels) {
+            const grid = document.getElementById('videoGrid');
+            const empty = document.getElementById('emptyState');
+            grid.innerHTML = '';
+            if (!reels || reels.length === 0) { empty.classList.remove('hidden'); grid.classList.add('hidden'); return; }
+            empty.classList.add('hidden'); grid.classList.remove('hidden');
+            reels.forEach(reel => {
+                grid.appendChild(createCard(reel));
+            });
+            updateSel();
+        }
+
+        function stopSearch() {
+            if (activeAbortController) {
+                activeAbortController.abort();
+                activeAbortController = null;
+            }
+            document.getElementById('streamingIndicator').classList.add('hidden');
+            document.getElementById('streamingIndicator').classList.remove('flex');
+            document.getElementById('btnSearch').disabled = false;
+            document.getElementById('btnSearch').innerHTML = '<span>' + i18n[currentLang]['btn_search'] + '</span>';
+            toast(i18n[currentLang]['toast_stopped'].replace('{count}', currentReels.length));
+        }
+        document.getElementById('btnStop').addEventListener('click', stopSearch);
+
+        document.getElementById('btnSearch').addEventListener('click', async () => {
+            const username = document.getElementById('usernameInput').value.trim();
+            if (!username) return;
+            const limit = document.getElementById('limitSelect').value;
+            const mediaType = document.getElementById('typeSelect').value;
+
+            currentReels = [];
+            reelsMap.clear();
+            document.getElementById('videoGrid').innerHTML = '';
+            document.getElementById('resultsArea').classList.add('hidden');
+            document.getElementById('errorState').classList.add('hidden');
+            document.getElementById('errorState').classList.remove('flex');
+            document.getElementById('emptyState').classList.add('hidden');
+            
+            document.getElementById('streamingIndicator').classList.remove('hidden');
+            document.getElementById('streamingIndicator').classList.add('flex');
+            document.getElementById('streamingStatus').innerText = `CONNECTING @${username.toUpperCase()}...`;
+
+            document.getElementById('btnSearch').disabled = true;
+            document.getElementById('btnSearch').innerHTML = '<div class="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div><span>...</span>';
+
+            activeAbortController = new AbortController();
+
+            try {
+                const response = await fetch(`/api/scrape/stream?username=${encodeURIComponent(username)}&limit=${limit}&media_type=${mediaType}`, {
+                    signal: activeAbortController.signal
+                });
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder('utf-8');
+                let buffer = '';
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop();
+
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const payload = JSON.parse(line.substring(6));
+
+                            if (payload.type === 'profile') {
+                                const prof = payload.profile;
+                                document.getElementById('profPic').src = '/api/proxy_image?url=' + encodeURIComponent(prof.profile_pic_url);
+                                document.getElementById('profName').innerText = prof.full_name;
+                                document.getElementById('profHandle').querySelector('span').innerText = '@' + prof.username;
+                                document.getElementById('profHandle').href = 'https://instagram.com/' + prof.username;
+                                document.getElementById('profBio').innerText = prof.biography;
+                                renderRelated(prof.related_profiles);
+
+                                document.getElementById('resultsArea').classList.remove('hidden');
+                                document.getElementById('resultsArea').classList.add('flex');
+                                document.getElementById('streamingStatus').innerText = i18n[currentLang]['status_mining'];
+                            } 
+                            else if (payload.type === 'reels_batch') {
+                                appendReels(payload.reels);
+                                document.getElementById('streamingStatus').innerText = `[${currentReels.length}] ` + i18n[currentLang]['status_mining'];
+                            } 
+                            else if (payload.type === 'done') {
+                                document.getElementById('streamingIndicator').classList.add('hidden');
+                                document.getElementById('streamingIndicator').classList.remove('flex');
+                                document.getElementById('btnSearch').disabled = false;
+                                document.getElementById('btnSearch').innerHTML = '<span>' + i18n[currentLang]['btn_search'] + '</span>';
+                                toast(i18n[currentLang]['toast_finished'].replace('{count}', payload.count));
+                                if (currentReels.length === 0) {
+                                    document.getElementById('emptyState').classList.remove('hidden');
+                                }
+                            } 
+                            else if (payload.type === 'error') {
+                                throw { message: payload.error, raw: payload.raw_error };
+                            }
+                        }
+                    }
+                }
+            } catch (err) {
+                if (err.name === 'AbortError') return;
+                document.getElementById('streamingIndicator').classList.add('hidden');
+                document.getElementById('streamingIndicator').classList.remove('flex');
+                document.getElementById('btnSearch').disabled = false;
+                document.getElementById('btnSearch').innerHTML = '<span>' + i18n[currentLang]['btn_search'] + '</span>';
+                
+                lastErrorText = (err.raw || err.message || JSON.stringify(err));
+                document.getElementById('errorMsg').innerText = err.message || err;
+                if (err.raw && err.raw !== err.message) {
+                    document.getElementById('rawErrorMsg').innerText = err.raw;
+                    document.getElementById('rawLogContainer').classList.remove('hidden');
+                } else {
+                    document.getElementById('rawLogContainer').classList.add('hidden');
+                }
+                document.getElementById('errorState').classList.remove('hidden');
+                document.getElementById('errorState').classList.add('flex');
+            }
+        });
+
+        document.getElementById('usernameInput').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('btnSearch').click(); });
+
+        // Download Batch as .ZIP directly to Browser
+        document.getElementById('btnDownload').addEventListener('click', async () => {
+            const checkedBoxes = Array.from(document.querySelectorAll('.reel-cb:checked'));
+            if (checkedBoxes.length === 0) { toast(currentLang === 'pt-BR' ? 'Selecione pelo menos 1 item.' : 'Select at least 1 item.'); return; }
+            
+            const items = checkedBoxes.map(cb => {
+                const r = reelsMap.get(cb.dataset.shortcode);
+                return {
+                    shortcode: r.shortcode,
+                    video_url: r.video_url,
+                    url: r.url
+                };
+            });
+
+            const btn = document.getElementById('btnDownload');
+            btn.disabled = true;
+            toast(i18n[currentLang]['toast_dl_zip_started'].replace('{count}', items.length));
+
+            try {
+                const res = await fetch('/api/download_zip', { 
+                    method: 'POST', 
+                    headers: {'Content-Type':'application/json'}, 
+                    body: JSON.stringify({ items: items }) 
+                });
+
+                if (res.ok) {
+                    const blob = await res.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `ghostreel_${items.length}_videos.zip`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                    toast(currentLang === 'pt-BR' ? 'Arquivo .ZIP baixado com sucesso!' : '.ZIP file downloaded successfully!');
+                } else {
+                    toast('Erro ao gerar arquivo .ZIP');
+                }
+            } catch(e) { 
+                toast('Erro ao baixar lote.'); 
+            } finally {
+                btn.disabled = false;
+            }
+        });
+
+
+    
+        
+        
+        </script>
+
+    </body>
+</html>

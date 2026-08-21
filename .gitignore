@@ -1,0 +1,26 @@
+# Credentials & Local Sessions
+session.json
+session.instaloader
+*.session
+.env
+
+# Media Downloads
+downloads/
+*.mp4
+*.jpg
+*.png
+!static/logo.jpg
+
+# Python Cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+env/
+venv/
+.venv/
+
+# OS Specific
+.DS_Store
+Thumbs.db

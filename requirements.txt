@@ -1,0 +1,5 @@
+fastapi
+uvicorn
+instaloader
+yt-dlp
+jinja2
