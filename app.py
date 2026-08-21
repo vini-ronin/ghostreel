@@ -20,6 +20,8 @@ DOWNLOAD_DIR = os.path.join(BASE_DIR, 'downloads')
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
 SESSION_FILE = os.path.join(BASE_DIR, 'session.json')
+NICHES_FILE = os.path.join(BASE_DIR, 'niches.json')
+RADAR_CACHE_FILE = os.path.join(BASE_DIR, 'radar_cache.json')
 
 def load_saved_session():
     if os.path.exists(SESSION_FILE):
@@ -29,6 +31,33 @@ def load_saved_session():
         except Exception:
             pass
     return {}
+
+def load_niches():
+    if os.path.exists(NICHES_FILE):
+        try:
+            with open(NICHES_FILE, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception:
+            pass
+    return []
+
+def save_niches(data):
+    with open(NICHES_FILE, 'w', encoding='utf-8') as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+def load_radar_cache():
+    if os.path.exists(RADAR_CACHE_FILE):
+        try:
+            with open(RADAR_CACHE_FILE, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception:
+            pass
+    return {}
+
+def save_radar_cache(data):
+    with open(RADAR_CACHE_FILE, 'w', encoding='utf-8') as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
 
 def save_session_data(sid: str, username: str = None, user_id: str = None):
     data = {'sessionid': sid, 'username': username, 'user_id': user_id}
@@ -92,6 +121,24 @@ def get_session_status():
     if sess.get('sessionid'):
         return {'logged_in': True, 'username': sess.get('username', 'conectado')}
     return {'logged_in': False}
+
+class NicheCreateRequest(BaseModel):
+    name: str
+    seeds: list[str]
+
+@app.get('/api/niches')
+def get_niches():
+    return load_niches()
+
+@app.post('/api/niches')
+def create_niche(req: NicheCreateRequest):
+    niches = load_niches()
+    n_id = req.name.lower().replace(' ', '_')
+    new_niche = {"id": n_id, "name": req.name.upper(), "seeds": req.seeds}
+    niches.append(new_niche)
+    save_niches(niches)
+    return {"status": "success", "niche": new_niche}
+
 
 @app.post('/api/session')
 async def save_session(req: SessionRequest):
@@ -286,6 +333,152 @@ async def scrape_stream(username: str, limit: int = 12, media_type: str = 'reels
             yield f"data: {json.dumps({'type': 'error', 'error': err_raw, 'raw_error': err_raw})}\n\n"
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")
+
+@app.get('/api/radar/stream')
+async def radar_stream(seed: str = Query(..., description="Username semente ou ID do nicho"), depth: int = 15):
+    async def event_generator():
+        try:
+            sess = load_saved_session()
+            sid = sess.get('sessionid')
+            user_id_cookie = sess.get('user_id') or (sid.split('%3A')[0] if sid and '%3A' in sid else '')
+
+            headers = {
+                'User-Agent': 'Instagram 319.0.0.38.109 Android (33/13; 420dpi; 1080x2400; samsung; SM-G998B; p3s; exynos2100; en_US)',
+                'X-IG-App-ID': '936619743392459',
+            }
+            cookies = {}
+            if sid:
+                cookies['sessionid'] = sid
+                cookies['ds_user_id'] = user_id_cookie
+
+            s = requests.Session()
+            s.headers.update(headers)
+            s.cookies.update(cookies)
+
+            # Verificar se seed é um ID de nicho preset
+            niches = load_niches()
+            target_seeds = [seed]
+            for n in niches:
+                if n['id'] == seed or n['name'].lower() == seed.lower():
+                    target_seeds = n['seeds']
+                    break
+
+            visited_users = set()
+            queue = list(target_seeds)
+
+            processed_count = 0
+
+            while queue and processed_count < depth:
+                current_username = queue.pop(0).strip().lstrip('@')
+                if not current_username or current_username in visited_users:
+                    continue
+                visited_users.add(current_username)
+
+                yield f"data: {json.dumps({'type': 'status', 'message': f'Analisando @{current_username}...'})}\n\n"
+                await asyncio.sleep(0.01)
+
+                try:
+                    # 1. Obter info do perfil
+                    r_user = s.get(f'https://i.instagram.com/api/v1/users/web_profile_info/?username={current_username}', headers={'X-IG-App-ID': '936619743392459', 'User-Agent': 'Mozilla/5.0'}, timeout=6)
+                    
+                    target_user_id = None
+                    followers = 0
+                    full_name = ''
+                    bio = ''
+                    pic_url = ''
+                    total_posts = 0
+
+                    if r_user.status_code == 200:
+                        u = r_user.json().get('data', {}).get('user', {})
+                        target_user_id = u.get('id')
+                        followers = u.get('edge_followed_by', {}).get('count', 0)
+                        full_name = u.get('full_name', '')
+                        bio = u.get('biography', '')
+                        pic_url = u.get('profile_pic_url', '')
+                        total_posts = u.get('edge_owner_to_timeline_media', {}).get('count', 0)
+                    else:
+                        r_lookup = s.get(f'https://i.instagram.com/api/v1/users/lookup/?q={current_username}', timeout=6)
+                        if r_lookup.status_code == 200:
+                            u = r_lookup.json().get('user', {})
+                            target_user_id = str(u.get('pk'))
+                            followers = u.get('follower_count', 0)
+                            full_name = u.get('full_name', '')
+                            pic_url = u.get('profile_pic_url', '')
+                        else:
+                            continue
+
+                    if not target_user_id:
+                        continue
+
+                    # 2. Descobrir mais contas do mesmo nicho via chaining (alimenta a corrente)
+                    try:
+                        r_chain = s.get(f'https://i.instagram.com/api/v1/discover/chaining/?target_id={target_user_id}', timeout=5)
+                        if r_chain.status_code == 200:
+                            for item in r_chain.json().get('users', []):
+                                un = item.get('username')
+                                if un and un not in visited_users and un not in queue:
+                                    queue.append(un)
+                    except Exception:
+                        pass
+
+                    # 3. Puxar últimos 12 vídeos para identificar os Top 3 Virais
+                    r_clips = s.post('https://i.instagram.com/api/v1/clips/user/', data={'target_user_id': str(target_user_id), 'page_size': '15'}, timeout=8)
+                    reels_list = []
+                    if r_clips.status_code == 200:
+                        raw_items = [c.get('media', {}) for c in r_clips.json().get('items', [])]
+                        for item in raw_items:
+                            if item.get('media_type') == 2 or item.get('video_versions'):
+                                sc = item.get('code')
+                                v_views = item.get('play_count') or item.get('view_count') or 0
+                                v_likes = item.get('like_count') or 0
+                                v_url = item['video_versions'][0].get('url') if item.get('video_versions') else None
+                                t_url = item.get('image_versions2', {}).get('candidates', [{}])[0].get('url', '')
+                                dur = item.get('video_duration', 0)
+                                cap = item.get('caption', {}).get('text', '') if isinstance(item.get('caption'), dict) else ''
+                                reels_list.append({
+                                    'shortcode': sc,
+                                    'views': v_views,
+                                    'likes': v_likes,
+                                    'video_url': v_url,
+                                    'thumbnail_url': t_url,
+                                    'duration': dur,
+                                    'caption': cap[:90] + '...' if len(cap) > 90 else cap
+                                })
+
+                    # Ordenar vídeos por views e selecionar Top 3
+                    reels_list.sort(key=lambda x: x['views'], reverse=True)
+                    top_3_virals = reels_list[:3]
+
+                    max_views = top_3_virals[0]['views'] if top_3_virals else 0
+                    outlier_score = round(max_views / max(followers, 1), 2)
+
+                    profile_entry = {
+                        'username': current_username,
+                        'full_name': full_name,
+                        'biography': bio,
+                        'profile_pic_url': pic_url,
+                        'followers': followers,
+                        'total_posts': total_posts,
+                        'max_views': max_views,
+                        'outlier_score': outlier_score,
+                        'top_virals': top_3_virals
+                    }
+
+                    processed_count += 1
+                    yield f"data: {json.dumps({'type': 'profile_found', 'profile': profile_entry})}\n\n"
+                    await asyncio.sleep(0.02)
+
+                except Exception as ex:
+                    print(f"Erro analisando {current_username}: {ex}")
+                    continue
+
+            yield f"data: {json.dumps({'type': 'done', 'count': processed_count})}\n\n"
+
+        except Exception as e:
+            yield f"data: {json.dumps({'type': 'error', 'error': str(e)})}\n\n"
+
+    return StreamingResponse(event_generator(), media_type="text/event-stream")
+
 
 # Download individual direto para o navegador com salvamento local
 @app.get('/api/download_video/{shortcode}')

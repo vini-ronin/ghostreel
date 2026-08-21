@@ -120,12 +120,32 @@
                 
 
             </section>
-            <section class="card-bg border p-6 md:p-8 max-w-5xl mx-auto mt-4 transition-colors">
-                <p class="eyebrow mb-4" data-i18n="quick_start">QUICK START</p>
+            <!-- Mode Tabs & Niche Presets Bar -->
+            <section class="max-w-5xl mx-auto mb-6 flex flex-col md:flex-row items-center justify-between gap-4 border-b dark:border-[#1a1a1a] border-slate-200 pb-4">
+                <div class="flex items-center gap-3">
+                    <button id="tabModeSearch" class="px-4 py-2 text-xs font-mono font-bold border-b-2 border-brand-500 text-brand-500 transition-colors flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                        <span>EXPLORADOR INDIVIDUAL</span>
+                    </button>
+                    <button id="tabModeRadar" class="px-4 py-2 text-xs font-mono font-bold border-b-2 border-transparent text-gray-500 hover:text-brand-500 transition-colors flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                        <span>RADAR DE NICHOS & VIRAIS</span>
+                    </button>
+                </div>
+
+                <!-- Niche Quick Selector -->
+                <div id="nicheSelectorContainer" class="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0">
+                    <span class="eyebrow text-gray-500 text-[10px] whitespace-nowrap">NICHOS:</span>
+                    <div id="nicheBadgesList" class="flex items-center gap-2"></div>
+                </div>
+            </section>
+
+            <section class="card-bg border p-6 md:p-8 max-w-5xl mx-auto mt-2 transition-colors">
+                <p class="eyebrow mb-4" id="searchModeTitle" data-i18n="quick_start">QUICK START / BUSCA DE PERFIL</p>
                 <div class="flex flex-col md:flex-row gap-4 items-stretch">
                     <div class="flex-1 relative">
                         <span class="absolute left-5 top-1/2 -translate-y-1/2 text-brand-500 font-mono text-lg">@</span>
-                        <input type="text" id="usernameInput" placeholder="username" class="w-full h-full min-h-[56px] input-bg pl-12 pr-6 border focus:outline-none focus:border-brand-500 transition-all font-mono text-base placeholder-gray-500">
+                        <input type="text" id="usernameInput" placeholder="username ou nicho" class="w-full h-full min-h-[56px] input-bg pl-12 pr-6 border focus:outline-none focus:border-brand-500 transition-all font-mono text-base placeholder-gray-500">
                     </div>
                     <div class="flex flex-wrap md:flex-nowrap gap-3">
                         <select id="typeSelect" class="input-bg px-4 min-h-[56px] border focus:outline-none focus:border-brand-500 font-mono text-xs cursor-pointer">
@@ -135,11 +155,10 @@
                         </select>
                         <select id="limitSelect" class="input-bg px-4 min-h-[56px] border focus:outline-none focus:border-brand-500 font-mono text-xs cursor-pointer">
                             <option value="9999" data-i18n="opt_all">TODOS OS ITENS</option>
-                                    <option value="12" selected data-i18n="opt_12_fast">12 ITENS (RÁPIDO)</option>
+                            <option value="12" selected data-i18n="opt_12_fast">12 ITENS (RÁPIDO)</option>
                             <option value="30" data-i18n="opt_30">30 ITENS</option>
                             <option value="50" data-i18n="opt_50">50 ITENS</option>
                             <option value="100" data-i18n="opt_100">100 ITENS</option>
-                            <option value="200" data-i18n="opt_200">200 ITENS</option>
                         </select>
                         <select id="sortSelect" class="input-bg px-4 min-h-[56px] border focus:outline-none focus:border-brand-500 font-mono text-xs cursor-pointer">
                             <option value="views" data-i18n="opt_sort_views">MAIS VIEWS</option>
@@ -152,6 +171,7 @@
                 </div>
             </section>
         </div>
+
 
         <!-- Main Content Area -->
         <main class="flex-grow w-full px-6 md:px-12 py-12">
@@ -243,6 +263,24 @@
                 <!-- Video Grid -->
                 <section id="videoGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></section>
                 <div id="emptyState" class="hidden text-center py-20 text-gray-500 font-mono text-sm" data-i18n="empty_state">Nenhum item encontrado com o filtro selecionado.</div>
+            </div>
+
+            <!-- Radar Profiles & Top Virals Container -->
+            <div id="radarResultsArea" class="hidden flex-col gap-8">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b dark:border-[#1a1a1a] border-slate-200 pb-4 gap-4">
+                    <div>
+                        <h2 class="text-xl font-bold dark:text-white text-slate-900 tracking-tight flex items-center gap-2">
+                            <svg class="w-5 h-5 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                            <span>DESCOBERTA RECURSIVA DE NICHO</span>
+                        </h2>
+                        <p class="text-xs font-mono text-gray-500 mt-1">Perfis encadeados com análise de taxa de viralidade e Top 3 conteúdos.</p>
+                    </div>
+                    <div class="flex items-center gap-4 font-mono text-xs text-gray-500">
+                        <span>PERFIS ANALISADOS: <b id="radarCount" class="text-brand-500">0</b></span>
+                    </div>
+                </div>
+                
+                <div id="radarProfilesGrid" class="grid grid-cols-1 gap-6"></div>
             </div>
         </main>
     </div>
@@ -882,10 +920,195 @@
         });
 
 
-    
-        
-        
+        // Modo Radar vs Explorador
+        let currentMode = 'search'; // 'search' ou 'radar'
+        let radarProfiles = [];
+
+        async function loadNichePresets() {
+            try {
+                const res = await fetch('/api/niches');
+                const niches = await res.json();
+                const container = document.getElementById('nicheBadgesList');
+                container.innerHTML = '';
+                niches.forEach(n => {
+                    const badge = document.createElement('button');
+                    badge.className = 'px-2.5 py-1 border dark:border-[#2a2a2a] border-slate-300 hover:border-brand-500 text-[11px] font-mono dark:text-gray-300 text-slate-700 hover:text-brand-500 dark:bg-[#080808] bg-slate-100 transition-colors whitespace-nowrap flex items-center gap-1.5';
+                    badge.innerHTML = `<span class="w-1.5 h-1.5 bg-brand-500 rounded-full"></span><span>${n.name}</span>`;
+                    badge.onclick = () => {
+                        document.getElementById('usernameInput').value = n.id;
+                        setMode('radar');
+                        triggerRadarSearch(n.id);
+                    };
+                    container.appendChild(badge);
+                });
+            } catch (e) {
+                console.error("Erro ao carregar nichos:", e);
+            }
+        }
+
+        function setMode(mode) {
+            currentMode = mode;
+            const btnSearch = document.getElementById('tabModeSearch');
+            const btnRadar = document.getElementById('tabModeRadar');
+            const title = document.getElementById('searchModeTitle');
+            const input = document.getElementById('usernameInput');
+
+            if (mode === 'search') {
+                btnSearch.classList.add('border-brand-500', 'text-brand-500');
+                btnSearch.classList.remove('border-transparent', 'text-gray-500');
+                btnRadar.classList.remove('border-brand-500', 'text-brand-500');
+                btnRadar.classList.add('border-transparent', 'text-gray-500');
+                title.innerText = 'QUICK START / BUSCA DE PERFIL';
+                input.placeholder = 'username (ex: renatocariani)';
+                document.getElementById('radarResultsArea').classList.add('hidden');
+                document.getElementById('radarResultsArea').classList.remove('flex');
+            } else {
+                btnRadar.classList.add('border-brand-500', 'text-brand-500');
+                btnRadar.classList.remove('border-transparent', 'text-gray-500');
+                btnSearch.classList.remove('border-brand-500', 'text-brand-500');
+                btnSearch.classList.add('border-transparent', 'text-gray-500');
+                title.innerText = 'RADAR DE NICHOS / BUSCA RECURSIVA DE PERFIS';
+                input.placeholder = 'nicho ou username semente (ex: fitness ou @cariani)';
+                document.getElementById('resultsArea').classList.add('hidden');
+                document.getElementById('resultsArea').classList.remove('flex');
+            }
+        }
+
+        document.getElementById('tabModeSearch').addEventListener('click', () => setMode('search'));
+        document.getElementById('tabModeRadar').addEventListener('click', () => setMode('radar'));
+
+        loadNichePresets();
+
+        async function triggerRadarSearch(seedTerm) {
+            const seed = seedTerm || document.getElementById('usernameInput').value.trim();
+            if (!seed) return;
+
+            radarProfiles = [];
+            document.getElementById('radarProfilesGrid').innerHTML = '';
+            document.getElementById('radarCount').innerText = '0';
+            document.getElementById('resultsArea').classList.add('hidden');
+            document.getElementById('radarResultsArea').classList.remove('hidden');
+            document.getElementById('radarResultsArea').classList.add('flex');
+            document.getElementById('errorState').classList.add('hidden');
+
+            document.getElementById('streamingIndicator').classList.remove('hidden');
+            document.getElementById('streamingIndicator').classList.add('flex');
+            document.getElementById('streamingStatus').innerText = `INICIANDO RADAR RECURSIVO PARA "${seed.toUpperCase()}"...`;
+
+            activeAbortController = new AbortController();
+
+            try {
+                const response = await fetch(`/api/radar/stream?seed=${encodeURIComponent(seed)}&depth=15`, {
+                    signal: activeAbortController.signal
+                });
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder('utf-8');
+                let buffer = '';
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop();
+
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const payload = JSON.parse(line.substring(6));
+
+                            if (payload.type === 'status') {
+                                document.getElementById('streamingStatus').innerText = payload.message;
+                            } else if (payload.type === 'profile_found') {
+                                appendRadarProfile(payload.profile);
+                            } else if (payload.type === 'done') {
+                                document.getElementById('streamingIndicator').classList.add('hidden');
+                                document.getElementById('streamingIndicator').classList.remove('flex');
+                                toast(`Radar concluído! ${payload.count} perfis analisados.`);
+                            }
+                        }
+                    }
+                }
+            } catch (err) {
+                if (err.name === 'AbortError') return;
+                document.getElementById('streamingIndicator').classList.add('hidden');
+                toast('Erro ao rodar radar.');
+            }
+        }
+
+        function appendRadarProfile(p) {
+            radarProfiles.push(p);
+            document.getElementById('radarCount').innerText = radarProfiles.length;
+            const grid = document.getElementById('radarProfilesGrid');
+
+            const card = document.createElement('div');
+            card.className = 'card-bg border p-6 flex flex-col md:flex-row gap-6 items-start justify-between transition-all hover:border-brand-500/50';
+
+            const viralsHtml = p.top_virals.map(v => `
+                <div class="relative group border dark:border-[#1a1a1a] border-slate-200 bg-black aspect-[9/16] w-24 overflow-hidden shrink-0">
+                    <img src="/api/proxy_image?url=${encodeURIComponent(v.thumbnail_url)}" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent flex flex-col justify-between p-1.5">
+                        <span class="text-[9px] font-mono text-brand-500 font-bold bg-black/80 px-1 border border-brand-500/30">V: ${fmt(v.views)}</span>
+                        <div class="flex gap-1 justify-end">
+                            <button onclick="triggerDownload('${v.shortcode}')" class="p-1 bg-black/90 text-white hover:text-brand-500 border border-white/20" title="Baixar Vídeo">
+                                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            const outlierBadge = p.outlier_score >= 1.0 
+                ? `<span class="border border-brand-500 bg-brand-500/10 text-brand-500 text-xs font-mono font-bold px-2 py-0.5 flex items-center gap-1">
+                     <svg class="w-3.5 h-3.5 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+                     TAXA OUTLIER: ${p.outlier_score}x
+                   </span>`
+                : `<span class="border border-gray-500/30 text-gray-400 text-xs font-mono px-2 py-0.5">TAXA OUTLIER: ${p.outlier_score}x</span>`;
+
+            card.innerHTML = `
+                <div class="flex items-start gap-4 flex-1">
+                    <img src="/api/proxy_image?url=${encodeURIComponent(p.profile_pic_url)}" class="w-14 h-14 rounded-full border dark:border-[#1a1a1a] border-slate-300 object-cover shrink-0">
+                    <div class="flex flex-col gap-1">
+                        <div class="flex items-center gap-3 flex-wrap">
+                            <h3 class="font-bold text-base dark:text-white text-slate-900">${p.full_name || p.username}</h3>
+                            <a href="https://instagram.com/${p.username}" target="_blank" class="text-xs font-mono text-brand-500 hover:underline">@${p.username}</a>
+                            ${outlierBadge}
+                        </div>
+                        <p class="text-xs text-gray-400 line-clamp-2 max-w-lg mt-1 font-sans">${p.biography || 'Sem biografia informada.'}</p>
+                        <div class="flex items-center gap-6 font-mono text-xs text-gray-500 mt-3">
+                            <div>SEGUIDORES: <b class="dark:text-white text-slate-800">${fmt(p.followers)}</b></div>
+                            <div>MAIOR VIRAL: <b class="text-brand-500">${fmt(p.max_views)} VIEWS</b></div>
+                            <div>TOTAL POSTS: <b class="dark:text-white text-slate-800">${p.total_posts}</b></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-2 shrink-0 w-full md:w-auto">
+                    <span class="eyebrow text-[10px] text-gray-500">TOP 3 VIRAIS DESTE PERFIL</span>
+                    <div class="flex gap-2 overflow-x-auto pb-1">
+                        ${viralsHtml || '<span class="text-xs font-mono text-gray-500">Sem mídias encontradas</span>'}
+                    </div>
+                    <button onclick="document.getElementById('usernameInput').value='${p.username}'; setMode('search'); document.getElementById('btnSearch').click();" class="mt-2 text-xs font-mono border border-brand-500/40 hover:border-brand-500 text-brand-500 py-1.5 px-3 transition-colors flex items-center justify-center gap-1.5">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                        <span>EXPLORAR TODOS OS VÍDEOS</span>
+                    </button>
+                </div>
+            `;
+
+            grid.appendChild(card);
+        }
+
+        // Alterar clique do botão de busca dependendo do modo ativo
+        const originalBtnSearchClick = document.getElementById('btnSearch').onclick;
+        document.getElementById('btnSearch').addEventListener('click', (e) => {
+            if (currentMode === 'radar') {
+                e.stopImmediatePropagation();
+                triggerRadarSearch();
+            }
+        }, true);
         </script>
 
     </body>
 </html>
+

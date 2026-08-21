@@ -1,0 +1,32 @@
+[
+  {
+    "id": "fitness",
+    "name": "FITNESS & BODYBUILDING",
+    "seeds": ["renatocariani", "laercjoberfredo", "juliobalestrinoficial"]
+  },
+  {
+    "id": "finance",
+    "name": "FINANÇAS & INVESTIMENTOS",
+    "seeds": ["thiago.nigro", "bruno_perini", "investidor.sardinha"]
+  },
+  {
+    "id": "tech_ai",
+    "name": "TECNOLOGIA & INTELIGÊNCIA ARTIFICIAL",
+    "seeds": ["filipedeschamps", "programador.br", "rocketseat"]
+  },
+  {
+    "id": "culinary",
+    "name": "CULINÁRIA & RECEITAS RÁPIDAS",
+    "seeds": ["receitasdepai", "moferrari", "receitasnestle"]
+  },
+  {
+    "id": "cortes_podcasts",
+    "name": "CORTES & PODCASTS",
+    "seeds": ["flowpdc", "podpah", "inteligencialtda"]
+  },
+  {
+    "id": "business_mkt",
+    "name": "MARKETING & NEGÓCIOS",
+    "seeds": ["marcopolo", "denerlippert", "viverdedividendos"]
+  }
+]
