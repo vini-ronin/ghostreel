@@ -45,7 +45,7 @@
 
 #### 2. Clonar o Repositório
 ```bash
-git clone https://github.com/SEU_USUARIO/ghostreel.git
+git clone https://github.com/vini-ronin/ghostreel.git
 cd ghostreel
 ```
 
@@ -97,7 +97,7 @@ Acesse no seu navegador: **`http://127.0.0.1:8000`**
 
 #### 2. Clone the Repository
 ```bash
-git clone https://github.com/YOUR_USERNAME/ghostreel.git
+git clone https://github.com/vini-ronin/ghostreel.git
 cd ghostreel
 ```
 
